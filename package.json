@@ -1,0 +1,29 @@
+{
+  "name": "csci3230_final",
+  "version": "1.0.0",
+  "description": "Web Dev Final Application",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MattONeill94/CSCI3230_Final.git"
+  },
+  "author": "Matthew O'Neill",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MattONeill94/CSCI3230_Final/issues"
+  },
+  "homepage": "https://github.com/MattONeill94/CSCI3230_Final#readme",
+  "dependencies": {
+    "body-parser": "^1.15.1",
+    "chart.js": "^2.1.6",
+    "express": "~4.13.1",
+    "express-session": "^1.13.0",
+    "pug": "^2.0.0-beta3",
+    "socket.io": "^1.4.6",
+    "node-uuid": "^1.4.7",
+    "mongoose": "^4.4.20",
+    "bcrypt-nodejs": "0.0.3"
+  }
+}

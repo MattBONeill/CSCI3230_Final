@@ -1,0 +1,120 @@
+.on_left {
+	float: right; 
+}
+
+.navbar-inverse{
+	background-image:-webkit-linear-gradient(top,#0dcb1b 0,#0d5a1b 100%);
+	background-image:-o-linear-gradient(top,#0dcb1b 0,#0d5a1b 100%);
+	background-image:-webkit-gradient(linear,left top,left bottom,from(#0dcb1b),to(#0d5a1b));
+	background-image:linear-gradient(to bottom,#0dcb1b 0,#0d5a1b 100%);
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0dcb1b', endColorstr='#ff0d5a1b', GradientType=0);
+	filter:progid:DXImageTransform.Microsoft.gradient(enabled=false);
+	background-repeat:repeat-x;
+	border-radius:4px;
+}
+
+/*0dcb1b light green*/
+
+/*0d5a1b dark green*/
+
+.content {
+	margin-top: 70px;
+}
+
+.navbar-inverse .navbar-nav>li>a  {
+    color: white;
+}
+
+.navbar-header>a>span {
+	color: white;
+}
+
+.navbar-header>a>img{
+	width: 25px;
+	height: auto;
+	vertical-align: center; float: left;
+	margin : 0 10px 0 0;
+}
+
+.navbar-header>a>img{
+	width: 25px;
+	height: auto;
+	vertical-align: center; float: left;
+	margin : 0 10px 0 0;
+}
+
+.nav>li>a>img{
+	width: 25px;
+	height: 25px;
+	vertical-align: center; float: left;
+	margin : 0 10px 0 0;
+}
+
+/* Comments*/
+
+.frendr_post {
+	width: 48%;
+	/*min-width: 48%;*/
+	border: 1px groove #ddd;
+	border-radius: 1px;
+	/*padding: 5px;*/
+	margin: 1%;
+	display: inline-block;
+}
+
+.post_header{
+	background-color: #eeeeee;
+	padding-bottom: 10px;
+	padding: 5px;
+}
+.post_head>img{
+	width: 30px;
+	height: 30px;
+	float: left;
+}
+.frendr_comment_img {
+	width: 24px;
+	height: 24px;
+}
+
+.post_head_username {
+	vertical-align: center;
+}
+
+.post_text {
+	clear: both;
+	/*border: 1px solid #ddd;*/
+	border-radius: 10px;
+	margin-top: 15px;
+	padding: 5px;
+}
+
+.post_comments {
+	background-color: #e0e0e0;
+}
+.comment_username, .frendur_comment_text {
+	display: inline-block;
+}
+
+.f_c_image{
+	width: 24px;
+	float: left;
+	height: 100%;
+	margin-right: 2px;
+}
+
+.f_c_text {
+	/*width: fill;*/
+	height: 100%;	
+}
+.f_c_text>span {
+	padding: 10px 10px;
+}
+.frendr_comment {
+	padding: 5px 5px;
+}
+
+footer {
+	clear: both;
+	text-align: center;
+}

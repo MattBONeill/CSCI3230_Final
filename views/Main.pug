@@ -1,0 +1,39 @@
+extends layout
+block in_head
+	link(rel="stylesheet" href="css/frendr_Main.css")
+
+block content
+	
+	div(class="content")
+		div(class="Welcome col-sm-12")
+			div(class="WelcomeBanner col-sm-8")
+				div(class="WBanner") Welcome to Frendur
+				div(class="WMain") We welcome you to yet another in a long line of Facebook knock-offs.
+				div(class="WOffer") We offer half of what Facebook has, with twice the work to do it!
+				div(class="WSeriously") Seriously though, Why ever use this social media platform, go use Facebook or something
+
+			div(class="signUp col-sm-4")
+				div(class="signUpText") Enter Here to Sign Up:
+				form(class="form-horizontal", role="form", action="/SignUp", method="post")
+					div(class="form-group")
+						div(class="col-sm-10")
+							input(type="text", class="form-control", id="username", name="username", placeholder="Username")
+					div(class="form-group")
+						div(class="col-sm-10")
+							input(type="text", class="form-control", id="email", name="email", placeholder="Email")
+					div(class="form-group")
+						div(class="col-sm-10")
+							input(type="text", class="form-control", id="fname", name="fname", placeholder="First Name")
+					div(class="form-group")
+						div(class="col-sm-10")
+							input(type="text", class="form-control", id="lname", name="lname", placeholder="Last Name")
+					div(class="form-group")
+						div(class="col-sm-10")
+							input(type="password", class="form-control", id="password", name="password", placeholder="Password")
+					div(class="form-group")
+						div(class="col-sm-10")
+							button(type="submit", class="btn btn-default col-sm-12") Sign Up
+
+		div(class="WelcomeExtra col-sm-12")
+			div(class="col-sm-12") Here is random text for getting you to join
+			div(class="col-sm-12") Here is Photos of happy people on the app

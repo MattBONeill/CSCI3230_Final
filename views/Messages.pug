@@ -1,0 +1,15 @@
+extends layout
+block in_head
+	link(rel="stylesheet" href="css/frendr_Messages.css")
+	script(src="js/Frendur_Messages.js")
+
+block content
+	
+	div(class="content")
+		div(class="Messages")
+			div(class="M_Friends_List")
+			div(class="M_Messages_List")
+			form(class="M_Form")
+				div(class="M_Input")
+					textarea(class="Message_Input", style="resize:none")
+					button(class="Send_Input") Send

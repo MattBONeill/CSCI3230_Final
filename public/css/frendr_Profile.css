@@ -1,0 +1,76 @@
+/*Banner*/
+.P_Banner{
+	margin: 1%;
+}
+
+.P_B_Image>img {
+	width: 150px;
+	height: 150px;
+}
+
+.P_B_Image {
+	width: 33%;
+	display: inline-block;
+}
+
+.P_B_username {
+	width: 66%;
+	display: inline-block;
+}
+
+
+/*Content*/
+.P_Content{
+	clear: both;
+	margin-top: 10px;
+}
+
+.P_C_Friends{
+	float: left;
+	border: 1px groove #ddd;
+	border-radius: 2px;
+	width: 32%;
+	margin: 1%;
+}
+
+.Friends_Banner{
+	width: 100%;
+	text-align: center;
+	background-color: #ccc;
+}
+
+.Friends_List{
+	background-color: #eee;
+}
+
+.P_C_Friend{
+	display: inline-block;
+	margin: 5px;
+	position: relative;
+}
+
+.P_C_Friend>img{
+	width: 75px;
+	height: 75px;
+	display: block;
+	margin: 0;
+}
+
+.P_C_Friend>span{
+	clear:both;
+}
+
+.P_C_Posts{
+	float: right;
+	width: 64%;
+	margin: 1%;
+}
+
+.frendr_post {
+	width: 100%;
+	border: 1px groove #ddd;
+	border-radius: 1px;
+	/*padding: 5px;*/
+	margin: 1%;
+	display: inline-block;
+}

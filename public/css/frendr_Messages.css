@@ -1,0 +1,105 @@
+.content {
+	float: left;
+	height: 600px;
+}
+.Messages {
+	position: relative;
+}
+
+.M_Friends_List {
+	overflow-y: scroll;
+	overflow-x: hidden;
+	width: 75px;
+	height: 600px;
+	max-height: 600px;
+	position: absolute;
+	left: 0;
+	top: 0;
+	margin: 0;
+ 	border: 1px solid #ddd;
+}
+
+.M_Friend {
+	position: relative;
+	display: inline-block;
+	margin: 0 5px; 
+}
+
+.M_Friend>span {
+
+}
+
+.M_Friend>img {
+	height: 50px;
+	width: 50px;
+	border-radius: 50px;
+	display: block;
+}
+
+.M_Messages_List {
+	overflow-y: scroll;
+	overflow-x: hidden;
+ 	width: 600px;
+ 	height: 550px;
+ 	border: 1px solid #ddd;
+ 	position: relative;
+ 	left: 75px;
+ 	top: 0;
+}
+
+.M_M_Image {
+	height: 45px;
+	width: 45px;
+	border-radius: 50px;
+	display: inline-block;
+}
+
+.M_M_Text {
+	display: inline-block;
+}
+
+.M_Message_R {
+	right: 0;
+	text-align: right;
+}
+.M_Message_R, .M_Message_L {
+	margin: 3px 0;
+}
+
+
+.M_Message_R>img {
+	margin-left: 5px;
+}
+
+.M_Message_L>img {
+	margin-right: 5px;
+}
+
+.M_Form {
+	position: absolute;
+	left: 75px;
+	top: 550px;
+ 	border: 1px solid #ddd;
+}
+
+.M_Input {
+	position: relative;
+	width: 600px;
+	height: 50px;
+}
+
+.Message_Input {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 500px;
+	height: 50px;
+}
+
+.Send_Input {
+	position: absolute;
+	right: 0;
+	width: 100px;
+	height: 50px;
+	top: 0;
+}
