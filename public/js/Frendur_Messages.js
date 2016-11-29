@@ -23,14 +23,41 @@ $(document).ready(function(){
 	        SendText();
     	}
 	});
+
+	setInterval(refreshMessages, 1000);
 });
+
+
+
+
+function refreshMessages()
+{
+	$.ajax({url:'/Messages?username='+CurrentUser, type:'Post', success: function(results){
+		if(Object.keys(results).length > 0)
+		{
+			var messages_text = "";
+			console.log(results);
+			for(var cnt in results)
+			{
+				messages_text += makeMessage(results[cnt].user, results[cnt].text, results[cnt].isUser);
+			}
+			$('.M_Messages_List').html("");
+			$('.M_Messages_List').append(messages_text);
+			ScrollPage();
+		}
+	}});
+}
 
 function SendText()
 {
 	if(CurrentUser)
 	{
-		$.ajax({url:'/Messages/Send', type:'Post', data: {username: CurrentUser, text: $('textarea').val(), timeSent: new Date().getTime()}});
-		$('textarea').val('');
+		if(checkTextToSend($('textarea').val()))
+		{	
+			$.ajax({url:'/Messages/Send', type:'Post', data: {username: CurrentUser, text: $('textarea').val(), timeSent: new Date().getTime()}});
+			$('textarea').val('');
+			refreshMessages();
+		}
 	}
 }
 
@@ -43,53 +70,38 @@ function onFriendClick(event)
 {
 	var username = $(event.currentTarget).find('span').text();
 	CurrentUser = username;
-	$.ajax({url:'/Messages?username='+username, type:'Post', success: function(results){
-		console.log(results);
-
-		if(Object.keys(results).length > 0)
-		{
-			var messages_text = "";
-			for(var cnt in results)
-			{
-				messages_text += makeMessage((results[cnt].isUser)? "Sumnut":username, results[cnt].text, results[cnt].isUser);
-			}
-			console.log(messages_text);
-			$('.M_Messages_List').append(messages_text);
-		}
-
-	}});
+	refreshMessages();
 }
 
 
 function makeFriend(username)
 {
-	return '<div class="M_Friend"><img src="/Profile/image?username='+username+'" /><span>'+username+'</span></div>';
+	return '<div class="M_Friend"><img src="/Profile/image?username='+username+'"><span>'+username+'</span></div>';
 }
+
 
 function makeMessage(username, text, isUser)
 {
-	var userClass;
-	if(isUser)
-		userClass = "M_Message_R";
-	else
-		userClass = "M_Message_L";
+	var message_text = ""
 
-	var message_text = '<div class="'+userClass+'">'
 	if(isUser)
-		message_text += makeMessageText(text) + makeMessageImage(username);
+	{
+		message_text += '<div class="M_Message_R">' + makeMessageText(text) + makeMessageImage(username) + '</div>';
+	}
 	else
-		message_text += makeMessageImage(username) + makeMessageText(text);
-	message_text += '</div>';
+	{
+		message_text += '<div class="M_Message_L">' + makeMessageImage(username) + makeMessageText(text) + '</div>';
+	}
 	return message_text;
 }
 
+
 function makeMessageImage(username)
 {
-	return '<img class="M_M_Image" src="/Profile/image?username='+username+'" />';
+	return '<img class="M_M_Image" src="/Profile/image?username='+username+'">';
 }
 
 function makeMessageText(text)
 {
 	return '<span class="M_M_Text">'+text+'</span>';
 }
-

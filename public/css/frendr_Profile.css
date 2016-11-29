@@ -3,7 +3,7 @@
 	margin: 1%;
 }
 
-.P_B_Image>img {
+.P_B_Image>img, .P_B_Image>a>img  {
 	width: 150px;
 	height: 150px;
 }
@@ -49,7 +49,7 @@
 	position: relative;
 }
 
-.P_C_Friend>img{
+.P_C_Friend>a>img{
 	width: 75px;
 	height: 75px;
 	display: block;

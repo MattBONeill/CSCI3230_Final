@@ -6,43 +6,21 @@ block content
 	
 	div(class="content")
 
-
-		a(href="/UploadProfilePicture") Upload Profile Image
-
 		div(class="")
 			div(class="P_Banner")
 				div(class="P_B_Image")
-					img(src="/Profile/my_image")
+					if(isYours)
+						a(href="/UploadProfilePicture")
+							img(src="/Profile/my_image")
+					else
+						img(src="/Profile/image?username=" + username)
 				div(class="P_B_username")
-					span Sumnut
+					span #{username}
 			div(class="P_Content")
 				div(class="P_C_Friends")
 					div(class="Friends_Banner")
 						span 
 							b Friends
 					div(class="Friends_List")
-						div(class="P_C_Friend")
-							img(src="/Profile/my_image")
-							span Sumnut
-						div(class="P_C_Friend")
-							img(src="/Profile/my_image")
-							span Sumnut
-						div(class="P_C_Friend")
-							img(src="/Profile/my_image")
-							span Sumnut
-						div(class="P_C_Friend")
-							img(src="/Profile/my_image")
-							span Sumnut
-						div(class="P_C_Friend")
-							img(src="/Profile/my_image")
-							span Sumnut
-						div(class="P_C_Friend")
-							img(src="/Profile/my_image")
-							span Sumnut
-						div(class="P_C_Friend")
-							img(src="/Profile/my_image")
-							span Sumnut
-
-
 				div(class="P_C_Posts")
 

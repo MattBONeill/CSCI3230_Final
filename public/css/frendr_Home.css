@@ -1,0 +1,38 @@
+.Home_Post {
+	position: relative;
+}
+
+.Home_Post>span {
+	text-align: center;
+	margin-left: 46%;
+	font-size: 16px;
+
+}
+
+.Home_Post>form {
+	background-color: #fff;
+	border: 1px groove #ddd;
+	width: 80%;
+	height: 100px;
+	margin: 0 10%;
+	position: relative;
+}
+
+.Home_Post>form>textarea {
+	border: none;
+	width: 100%;
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 70px;
+
+}
+
+.Home_Post>form>button{
+	position: absolute;
+	border: none;
+	right: 0;
+	bottom: 0;
+	width : 60px;
+	height: 30px;
+}

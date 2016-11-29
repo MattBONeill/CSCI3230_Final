@@ -218,13 +218,125 @@ app.get('/Home', function(request, response){
         renderPage(request.session, response, "Home", "Home Page");
 });
 
+app.post('/Posts', function(request, response){
+    if(!isLoggedIn(request.session))
+        response.redirect('/')
+    else{
+        var query = request.query;
+        if(Object.keys(query).length < 1)
+        {
+            //find all friends for user
+            Friends.find({userID: request.session.username}).select({friendID: 1}).exec(function(error, results){
+                if(error || results.length < 0){
+                    response.send({});
+                    return;
+                }
+                //create an or statment in mongodb for all possible friend posts
+                var friends_or = [];
+                results.forEach(function(row){
+                    friends_or.push({userID: row.friendID});
+                });
+                //add current user id as well
+                friends_or.push({userID: request.session.username});
+
+                //get the last 50 post for table, sort by time 
+                Posts.find({$or: friends_or}).sort({timeSent:1}).limit(50).exec(function(error, results){
+                    if(error || results.length < 0){
+                        response.send({});
+                        return;
+                    }
+                    //create an or statment for mongod to get all comments for each post
+                    var comment_or = [];
+                    results.forEach(function(row){
+                        comment_or.push({commentID: row._id});
+                    });
+
+                    //find all availble comments for each post
+                    Comments.find({$or: comment_or}).exec(function(error, comment_results){
+                        if(error || comment_results.length < 0){
+                            response.send({comments: {}, posts: results});
+                            return;
+                        }   
+                        //create and object that is sorted into slots for each comment
+                        var dic_comment = {};
+                        comment_results.forEach(function(row){
+                            if(!dic_comment[row.commentID])
+                                dic_comment[row.commentID] = [];
+                            dic_comment[row.commentID].push(row);
+                        });
+                        //send response to user
+                        response.send({comments: dic_comment, posts: results});
+                    });
+                });
+            });
+        }
+        else
+        {
+            var user = query.username;
+            //get the last 50 post for table, sort by time 
+            Posts.find({userID: user}).sort({timeSent:1}).limit(50).exec(function(error, results){
+                if(error || results.length < 0){
+                    response.send({});
+                    return;
+                }
+
+                //create an or statment for mongod to get all comments for each post
+                var comment_or = [];
+                results.forEach(function(row){
+                    comment_or.push({commentID: row._id});
+                });
+
+                //find all availble comments for each post
+                Comments.find({$or: comment_or}).exec(function(error, comment_results){
+                    if(error || comment_results.length < 0){
+                        response.send({comments: {}, posts: results});
+                        return;
+                    }   
+                    //create and object that is sorted into slots for each comment
+                    var dic_comment = {};
+                    comment_results.forEach(function(row){
+                        if(!dic_comment[row.commentID])
+                            dic_comment[row.commentID] = [];
+                        dic_comment[row.commentID].push(row);
+                    });
+                    //send response to user
+                    response.send({comments: dic_comment, posts: results});
+                });
+            });
+        }
+    }
+});
+
+app.post('/Posts/Submit', function(request, response){
+    if(!isLoggedIn(request.session))
+        response.redirect('/')
+    else{
+        saveNewResponse(Posts, {userID: request.session.username, text: request.body.text , timeSent: request.body.timeSent});        
+        response.send('');
+    }
+});
+
+app.post('/Posts/Comment', function(request, response){
+    if(!isLoggedIn(request.session))
+        response.redirect('/')
+    else{
+        var body = request.body;
+        saveNewResponse(Comments,{commentID: body.postID, userID: request.session.username, text: body.text, timeSent: body.timeSent});
+        response.send('');
+    }
+});
+
 app.get('/Profile', function(request, response){
     if(!isLoggedIn(request.session))
         response.redirect('/')
     else{
-        console.log(request.query);
-
-        renderPage(request.session, response, "Profile", "Profile Page - " + request.session.username);
+        var query = request.query;
+        if(Object.keys(query).length < 1 || query.username === request.session.username)
+        {
+            renderPage(request.session, response, "Profile", "Profile Page - " + request.session.username,  {isYours: true});
+        }
+        else
+            renderPage(request.session, response, "Profile", "Profile Page - " + query.username, {username: query.username});
     }
 });
 
@@ -235,25 +347,20 @@ app.get('/Messages', function(request, response){
         renderPage(request.session, response, "Messages", "Messages");
 });
 
-
 app.post('/Messages/Send', function(request, response){
     if(!isLoggedIn(request.session))
         response.redirect('/')
     else{
-        
-        console.log(request.body);
-
-
+        saveNewResponse(Messages, {userID: request.session.username, friendID: request.body.username, text: request.body.text, timeSent: request.body.timeSent});
+        response.send('');
     }
 });
-
 
 app.post('/Messages', function(request, response){
     if(!isLoggedIn(request.session))
         response.redirect('/')
     else{
         var query = request.query;
-        console.log('Query', query);
         if(Object.keys(query).length < 1)
         {
             Friends.find({userID: request.session.username}).select({friendID: 1}).exec(function(error, results){
@@ -296,13 +403,13 @@ app.post('/Messages', function(request, response){
                             if(m_cnt >= my_results.length)
                             {
                                 for(; t_cnt < their_results.length; t_cnt++)
-                                    messages.push({text: their_results[t_cnt].text, timeSent: their_results[t_cnt].timeSent, isUser: false});
+                                    messages.push({user: query.username, text: their_results[t_cnt].text, timeSent: their_results[t_cnt].timeSent, isUser: false});
                                 break;
                             }
                             if(t_cnt >= their_results.length)
                             {
                                 for(; m_cnt < my_results.length; m_cnt++)
-                                    messages.push({text: my_results[m_cnt].text, timeSent: my_results[m_cnt].timeSent, isUser: true});
+                                    messages.push({user: request.session.username, text: my_results[m_cnt].text, timeSent: my_results[m_cnt].timeSent, isUser: true});
                                 break;
                             }
 
@@ -310,12 +417,12 @@ app.post('/Messages', function(request, response){
                             var my = my_results[m_cnt];
                             if(Number(their.timeSent) < Number(my.timeSent))
                             {
-                                messages.push({text: their.text, timeSent: their.timeSent, isUser: false });
+                                messages.push({user: query.username, text: their.text, timeSent: their.timeSent, isUser: false });
                                 t_cnt++
                             }
                             else
                             {
-                                messages.push({text: my.text, timeSent: my.timeSent, isUser: true }); 
+                                messages.push({user: request.session.username, text: my.text, timeSent: my.timeSent, isUser: true }); 
                                 m_cnt++  
                             }
 
@@ -378,6 +485,31 @@ app.get('/Profile/image', function(request, response){
         var username = request.query.username;
         var dir =  __dirname + '\\public\\uploads\\' + username +"_profile.png";
         response.sendFile(dir);
+    }
+});
+
+app.post('/Profile/Friends', function(request, response){
+    if(!isLoggedIn(request.session))
+        response.redirect('/')
+    else{
+        var query = request.query;
+        var user = request.session.username;
+        if(Object.keys(query).length > 0)
+        {
+            user = query.username;
+        }
+        Friends.find({userID: user}).select({friendID: 1}).exec(function(error, results){
+            if(error || results.length < 1)
+            {
+                response.send([]);
+                return
+            }
+            var friends = [];
+            results.forEach(function(row){
+                friends.push(row.friendID);
+            });
+            response.send(friends);
+        });
     }
 });
 
@@ -512,14 +644,6 @@ function isLoggedIn(session)
 }
 
 
-
-// app.post('/login', function(request, response){
-//     //get the sid and password
-//     var sid = request.body.sid;
-//     var password = request.body.password;
-// });
-
-
 function renderPage(session, response, page, title, params)
 {
     //if params is empty then make it an empty object,
@@ -535,7 +659,6 @@ function renderPage(session, response, page, title, params)
     //render the page with its parameters
     response.render(page, pageParams);  
 }
-
 
 function login(session, sid, password, onSuccess, onFail)
 {
@@ -603,16 +726,43 @@ io.on('connection', function(socket){
     // var session = socket.request.session;
 });
 
-
-
 cleanDB();
 
 searchDBForResponse(Friends, { userID: "Sumnut", friendID: "Sumnut2"}, { userID: "Sumnut", friendID: "Sumnut2"});
+searchDBForResponse(Friends, { userID: "Sumnut2", friendID: "Sumnut"}, { userID: "Sumnut2", friendID: "Sumnut"});
+
 
 
 saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut2", text: "Temp messages", timeSent: 10000000});
 saveNewResponse(Messages, { userID: "Sumnut2", friendID: "Sumnut", text: "Temp messages2", timeSent: 10000001});
 saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut2", text: "Temp messages3", timeSent: 10000002});
+
+saveNewResponse(Posts, {userID: "Sumnut2", text: "I feeling awesome3", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut", text: "I feeling awesome2", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut2", text: "I feeling awesome4", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut", text: "I feeling awesome1", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut2", text: "I feeling awesome5", timeSent: Number(new Date().getTime())});
+
+setTimeout(function() {
+    Posts.find({userID: "Sumnut"}).limit(1).then(function(results){
+        saveNewResponse(Comments,{commentID: results[0]._id, userID:"Sumnut2", text:"Well fuck you", timeSent: Number(new Date().getTime())});
+    });
+}, 100);
+
+
+// var Posts = mongoose.model('posts', postTable);
+//     userID: String,
+//     text: String,
+//     timeSent: Number
+
+// var Comments = mongoose.model('comments', CommentsTable);
+//     commentID: String,
+//     userID: String,
+//     text :String,
+//     timeSent: Number
+
+
+
 
 
 // saveNewResponse(Users, { username: "Sumnut", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("stronger")});

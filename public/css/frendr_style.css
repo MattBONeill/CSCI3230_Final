@@ -91,6 +91,7 @@
 
 .post_comments {
 	background-color: #e0e0e0;
+	padding-bottom: 5px;
 }
 .comment_username, .frendur_comment_text {
 	display: inline-block;
@@ -117,4 +118,17 @@
 footer {
 	clear: both;
 	text-align: center;
+}
+#comment_bar {
+	width: 100%;
+	padding : 5px 5px 0 5px;
+}
+
+#comment_bar>input {
+	width: 80%;
+ 	height: 24px;
+}
+
+#comment_bar>img {
+	margin-right: 5px;
 }

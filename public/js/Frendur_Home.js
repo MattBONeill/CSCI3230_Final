@@ -1,6 +1,31 @@
-$(document).ready(function(){
 
-	var cnt;
-	for(cnt = 0; cnt < 8; cnt++)
-		$('.content').append(makePost("Sumnut", "This is a dynamic Post Text: " + cnt, [{username: 'Sumnut', text: "This is a dynaimc Comment Test: " + cnt}]));
+function PostRefresh()
+{
+	refreshPosts('/Posts', '.content');
+}
+
+$(document).ready(function(){
+	PostRefresh();
+
+	$('form').submit(function(temp){
+		SendPost();
+		return false;
+	});
+
+	$('textarea').keypress(function(event) {
+	    if (event.keyCode == 13) {
+	        SendPost();
+    	}
+	});
 });
+
+function SendPost()
+{
+	if(checkTextToSend($('textarea').val()))
+	{	
+		$.ajax({url:'/Posts/Submit', type:'Post', data: { text: $('textarea').val(), timeSent: Number(new Date().getTime())}});
+		$('textarea').val('');
+		setTimeout(function() {refreshPosts();}, 100);
+	}
+}
+
