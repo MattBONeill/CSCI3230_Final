@@ -70,7 +70,10 @@
 	width: 100%;
 	border: 1px groove #ddd;
 	border-radius: 1px;
-	/*padding: 5px;*/
 	margin: 1%;
 	display: inline-block;
+}
+
+.P_B_username>button {
+	float: right;
 }

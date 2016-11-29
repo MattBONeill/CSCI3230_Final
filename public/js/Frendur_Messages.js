@@ -1,6 +1,5 @@
 var CurrentUser = null;
 
-
 $(document).ready(function(){
 	$.ajax({url:'/Messages', type:'Post', success: function(results){
 		var friends = ""
@@ -28,11 +27,10 @@ $(document).ready(function(){
 });
 
 
-
-
 function refreshMessages()
 {
 	$.ajax({url:'/Messages?username='+CurrentUser, type:'Post', success: function(results){
+			$('.M_Messages_List').html("");
 		if(Object.keys(results).length > 0)
 		{
 			var messages_text = "";
@@ -41,7 +39,6 @@ function refreshMessages()
 			{
 				messages_text += makeMessage(results[cnt].user, results[cnt].text, results[cnt].isUser);
 			}
-			$('.M_Messages_List').html("");
 			$('.M_Messages_List').append(messages_text);
 			ScrollPage();
 		}

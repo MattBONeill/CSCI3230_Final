@@ -4,159 +4,35 @@ var bodyParser = require("body-parser");
 var uuid = require('node-uuid');
 var app = express();
 var http = require('http').Server(app);
-var io = require('socket.io')(http);
 var mongoose = require('mongoose');
 var bcrypt = require('bcrypt-nodejs');
 var fileUpload = require('express-fileupload');
-var fs = require('fs');
-//has the Instructor set to a random value, use uuid to make the guess of the string harder
-//the change is so if the user found a way to change the isInstructor session variable to
-//a value that woule register as true in the followin statement, then they would be able to easly
-//be able to break in
-// if(request.session.isInstructor) // easly breakable if access to session data
-//the following is a bit harder, they would have to have access to the server variable data
 
-/**** Databases ****/
-
-//setup server for saving the response data
-// mongoose.connect('localhost:27018/Response_System');
-// var Schema = mongoose.Schema;
-
-// /**** Yes No Response Question - Response Database ****
-// * lecture - the Lecture ID
-// * studentid - the UUID that of the student that sent the response
-// * tag_title - the title of the YNRQ that was sent
-// * section - the section in the lecture that the YNRQ is in
-// * response - the value of the response that was sent in (1 - yes,0 - no,-1 - unknown)
-// *******************************************************/
-// var student_YNRQ_schema = new Schema({
-//     lecture: String,
-//     studentid: String,
-//     tag_title: String,
-//     section: String,
-//     response: Number
-// },{collection: 'yesno_response'});
-// var student_YNRQ_DB = mongoose.model('yesno_response', student_YNRQ_schema);
-
-// /**** Lecture ID To Name - Database ****
-// * lectureID - the Lecture ID
-// * lecture_title - the title of the lecture
-// *******************************************************/
-// var Lecture_ID_Name_schema = new Schema({
-//     lectureID: String,
-//     lecture_title: String
-// },{collection: 'lecture_id_to_name'});
-// var Lecture_ID_Name = mongoose.model('lecture_id_to_name', Lecture_ID_Name_schema);
-
-// *** Multiple Choice Response Question - Response Database ****
-// * lecture - the Lecture ID
-// * studentid - the UUID that of the student that sent the response
-// * multi_title - the title of the MCRQ that was sent
-// * response - the value of the response that was sent in (Answer is in the from of a "Q" followed by the number of the question)
-// ***************************************************************
-// var student_multiple_choice_response_schema = new Schema({
-//     lecture: String,
-//     studentid: String,
-//     multi_title: String,
-//     response: String
-// },{collection: 'multiple_response'});
-// var student_multiple_choice_ResponseDB = mongoose.model('multiple_response', student_multiple_choice_response_schema);
-
-// /**** Multiple Choice Response Question - Question Stats Database ****
-// * title - title of the MCRQ
-// * lecture - the Lecture ID of the MCRQ
-// * status - true, if the answer is open. false, if the answer is closed.
-// * answer - The correct answer to the question
-// **********************************************************************/
-// var multiple_choice_lecture_status_schema = new Schema({
-//     title: String,
-//     lecture: String,
-//     status: Boolean,
-//     answer: Number
-// },{collection: 'multiple_choice_status'});
-// var multiple_choice_lecture_statusDB = mongoose.model('multiple_choice_status', multiple_choice_lecture_status_schema);
-
-// /**** User - Database ****
-// * userid - a UUID unique to the the student id
-// * sid - the students/instructor ID number
-// * hashedPassword - the students password that was Hashed by the bcrypt plugin
-// * isInstructor - if the User is an Instructor or not
-// **************************/
-// var userSchema = new Schema({
-//     userid: {type: String, 
-//               unique: true,
-//               index: true},
-//     sid: {type: String,
-//         unique: true},
-//     hashedPassword: String,
-//     isInstructor: Boolean
-// }, {collection: 'users'});
-// var UserDB = mongoose.model('user', userSchema);
-
-// var student_YNRQ_schema = new Schema({
-//     lecture: String,
-//     studentid: String,
-//     tag_title: String,
-//     section: String,
-//     response: Number
-// },{collection: 'yesno_response'});
-// var student_YNRQ_DB = mongoose.model('yesno_response', student_YNRQ_schema);
-
-
-//be able to parse post data
+//build the parser of body arguments
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-//set the port to 3000
+//set standard port to 3000 or the port in the arguments
 app.set('port', process.env.PORT || 3000)
 
-//static files for .css and .js files
+//Static folder for js css and images
 app.use(express.static('public'));
 
-// able to access the templates
+// able to get the Pug files
 app.set('views', __dirname + '/views');
 app.set('view engine', 'pug');
 
 app.use(fileUpload());
 
-
-//taken from randy's example
 var sessionMiddleware = session({
     genid: function(request) {
         return uuid.v4();
     },
-    resave: false,             // save only when changed
-    saveUninitialized: false,  // save even when no data
-    // this is used when signing the session cookie
-    // cookie: { secure: true }, // encrypted cookies only
-    secret: 'apollo slackware prepositional expectations'
+    resave: false,
+    saveUninitialized: false,
+    secret: 'profit contributor competitor equality'
 });
-function cleanDB()
-{
-    // Users.remove({}, function(err) { 
-    //     console.log('collection removed') 
-    // });
-    Posts.remove({}, function(err) { 
-        console.log('collection removed') 
-    });
-    Friends.remove({}, function(err) { 
-        console.log('collection removed') 
-    });
-    Messages.remove({}, function(err) { 
-        console.log('collection removed') 
-    });
-    Comments.remove({}, function(err) { 
-        console.log('collection removed') 
-    });
-}
-
 app.use(sessionMiddleware);
-
-// var uploading = multer({
-//   dest: __dirname + '../public/uploads/',
-//   limits: {fileSize: 10000000, files:1}
-// });
-
 
 /***Database Schema***/
 
@@ -202,6 +78,25 @@ var CommentsTable = new Schema({
     timeSent: Number
 }, {collection: 'comments'});//note: auto creates id, boo ya
 var Comments = mongoose.model('comments', CommentsTable);
+
+function cleanDB()
+{
+    Users.remove({}, function(err) { 
+        console.log('collection removed') 
+    });
+    Posts.remove({}, function(err) { 
+        console.log('collection removed') 
+    });
+    Friends.remove({}, function(err) { 
+        console.log('collection removed') 
+    });
+    Messages.remove({}, function(err) { 
+        console.log('collection removed') 
+    });
+    Comments.remove({}, function(err) { 
+        console.log('collection removed') 
+    });
+}
 
 
 app.get('/', function(request, response){
@@ -333,10 +228,16 @@ app.get('/Profile', function(request, response){
         var query = request.query;
         if(Object.keys(query).length < 1 || query.username === request.session.username)
         {
-            renderPage(request.session, response, "Profile", "Profile Page - " + request.session.username,  {isYours: true});
+            renderPage(request.session, response, "Profile", "Profile Page - " + request.session.username,  {isYours: true, isFriend: true});
         }
-        else
-            renderPage(request.session, response, "Profile", "Profile Page - " + query.username, {username: query.username});
+        else{
+            Friends.find({userID: request.session.username, friendID: query.username}).limit(1).exec(function(error, results){
+                if(error || results.length < 1)
+                    renderPage(request.session, response, "Profile", "Profile Page - " + query.username, {username: query.username, isFriend: false});
+                else
+                    renderPage(request.session, response, "Profile", "Profile Page - " + query.username, {username: query.username, isFriend: true});
+            });            
+        }
     }
 });
 
@@ -390,8 +291,8 @@ app.post('/Messages', function(request, response){
                     sort({timeSent:1}).select({text: 1, timeSent: 1}).exec(function(error, their_results){
                         if(error || (their_results.length <  1 && my_results.length < 1))
                         {
-                            response.send({});
-                            console.log('their',error,  my_results, their_results);
+                            response.send([]);
+                            // console.log('their',error,  my_results, their_results);
                             return;
                         }
 
@@ -513,6 +414,15 @@ app.post('/Profile/Friends', function(request, response){
     }
 });
 
+app.post('/Profile/Friends/Add', function(request, response){
+    if(!isLoggedIn(request.session))
+        response.redirect('/')
+    else{
+        searchDBForResponse(Friends, { userID: request.session.username, friendID: request.body.username}, { userID: request.session.username, friendID: request.query.username});
+        response.send('');
+    }
+});
+
 app.get('/SignOut', function(request, response){
     request.session.username = null;
     response.redirect('/')  
@@ -628,7 +538,6 @@ function AnyError(error, response, name, redir)
     response.redirect(redir);
 }
 
-
 function SignupError(error, response)
 {
     AnyError(error, response, "SignUp", '/');
@@ -660,38 +569,6 @@ function renderPage(session, response, page, title, params)
     response.render(page, pageParams);  
 }
 
-function login(session, sid, password, onSuccess, onFail)
-{
-    console.log('Logging In User');
-    //check of there is user with the sid that was submitted
-    UserDB.find({sid: sid}).limit(1).exec(function(error, results){
-        if(error)
-        {
-            console.log("Login Error: " + error, "sid: "+sid +" password:"+ password);
-            onFail("Unable to process you request");
-            return;
-        }
-        if((results.length > 0) && (bcrypt.compareSync(password, results[0].hashedPassword)))
-        {
-            console.log('Successfully Logged in User, ' + sid);
-            //successful login, contiune with the login
-            session.userid = results[0].userid;
-            if(results[0].isInstructor === true)
-                session.isInstructor = instructorKey;
-            else
-                session.isInstructor = results[0].isInstructor;
-            session.sid = results[0].sid;
-            onSuccess();
-        }
-        else
-        {
-            //incorect password call the on fall method
-            console.log("Login Attempt: " + sid /*+ " Password: " + password*/);
-            onFail("Invalid Student ID or Password");
-        }
-    });
-}
-
 function searchDBForResponse(DB, searchQuery, newResponse)
 {
     DB.find(searchQuery).limit(1).exec(function(error, results){
@@ -721,82 +598,111 @@ function saveNewResponse(DB, value)
     });
 }
 
-//setup teacher controlling slide 
-io.on('connection', function(socket){
-    // var session = socket.request.session;
-});
-
 cleanDB();
 
-searchDBForResponse(Friends, { userID: "Sumnut", friendID: "Sumnut2"}, { userID: "Sumnut", friendID: "Sumnut2"});
-searchDBForResponse(Friends, { userID: "Sumnut2", friendID: "Sumnut"}, { userID: "Sumnut2", friendID: "Sumnut"});
+//set up users
+saveNewResponse(Users, { username: "Sumnut", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut2", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut3", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut4", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut5", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut6", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut7", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut8", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut9", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+saveNewResponse(Users, { username: "Sumnut10", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("temp")});
+
+//set up friends
+saveNewResponse(Friends, { userID: "Sumnut", friendID: "Sumnut2"});
+saveNewResponse(Friends, { userID: "Sumnut2", friendID: "Sumnut"});
+
+saveNewResponse(Friends, { userID: "Sumnut", friendID: "Sumnut3"});
+saveNewResponse(Friends, { userID: "Sumnut3", friendID: "Sumnut"});
+
+saveNewResponse(Friends, { userID: "Sumnut", friendID: "Sumnut4"});
+saveNewResponse(Friends, { userID: "Sumnut4", friendID: "Sumnut"});
+
+saveNewResponse(Friends, { userID: "Sumnut", friendID: "Sumnut5"});
+saveNewResponse(Friends, { userID: "Sumnut5", friendID: "Sumnut"});
+
+saveNewResponse(Friends, { userID: "Sumnut2", friendID: "Sumnut3"});
+saveNewResponse(Friends, { userID: "Sumnut3", friendID: "Sumnut2"});
+
+saveNewResponse(Friends, { userID: "Sumnut2", friendID: "Sumnut4"});
+saveNewResponse(Friends, { userID: "Sumnut4", friendID: "Sumnut2"});
+
+saveNewResponse(Friends, { userID: "Sumnut4", friendID: "Sumnut4"});
+saveNewResponse(Friends, { userID: "Sumnut5", friendID: "Sumnut5"});
+
+saveNewResponse(Friends, { userID: "Sumnut4", friendID: "Sumnut6"});
+saveNewResponse(Friends, { userID: "Sumnut6", friendID: "Sumnut4"});
+
+saveNewResponse(Friends, { userID: "Sumnut6", friendID: "Sumnut7"});
+saveNewResponse(Friends, { userID: "Sumnut7", friendID: "Sumnut6"});
+
+saveNewResponse(Friends, { userID: "Sumnut6", friendID: "Sumnut8"});
+saveNewResponse(Friends, { userID: "Sumnut8", friendID: "Sumnut6"});
+
+saveNewResponse(Friends, { userID: "Sumnut10", friendID: "Sumnut9"});
+saveNewResponse(Friends, { userID: "Sumnut9", friendID: "Sumnut10"});
+
+saveNewResponse(Friends, { userID: "Sumnut", friendID: "Sumnut9"});
+saveNewResponse(Friends, { userID: "Sumnut9", friendID: "Sumnut"});
 
 
+saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut2", text: "Hi", timeSent: 10000000});
+saveNewResponse(Messages, { userID: "Sumnut2", friendID: "Sumnut", text: "Hey", timeSent: 10000001});
+saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut2", text: "How's it going", timeSent: 10000002});
 
-saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut2", text: "Temp messages", timeSent: 10000000});
-saveNewResponse(Messages, { userID: "Sumnut2", friendID: "Sumnut", text: "Temp messages2", timeSent: 10000001});
-saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut2", text: "Temp messages3", timeSent: 10000002});
+saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut3", text: "Yo", timeSent: 10000000});
+saveNewResponse(Messages, { userID: "Sumnut3", friendID: "Sumnut", text: "What up?", timeSent: 10000001});
+saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut3", text: "not Much You?", timeSent: 10000002});
 
-saveNewResponse(Posts, {userID: "Sumnut2", text: "I feeling awesome3", timeSent: Number(new Date().getTime())});
-saveNewResponse(Posts, {userID: "Sumnut", text: "I feeling awesome2", timeSent: Number(new Date().getTime())});
-saveNewResponse(Posts, {userID: "Sumnut2", text: "I feeling awesome4", timeSent: Number(new Date().getTime())});
-saveNewResponse(Posts, {userID: "Sumnut", text: "I feeling awesome1", timeSent: Number(new Date().getTime())});
-saveNewResponse(Posts, {userID: "Sumnut2", text: "I feeling awesome5", timeSent: Number(new Date().getTime())});
+
+saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut10", text: "Dude", timeSent: 10000000});
+saveNewResponse(Messages, { userID: "Sumnut10", friendID: "Sumnut", text: "What?", timeSent: 10000001});
+saveNewResponse(Messages, { userID: "Sumnut", friendID: "Sumnut10", text: "DUDE!!!!", timeSent: 10000002});
+
+
+saveNewResponse(Posts, {userID: "Sumnut", text: "She was a fast machine", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut2", text: "She kept her motor clean", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut3", text: "She was the best damn woman I had ever seen", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut4", text: "She had the sightless eyes", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut5", text: "Telling me no lies", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut6", text: "Knockin' me out with those American thighs", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut7", text: "Taking more than her share", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut8", text: "Had me fighting for air", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut9", text: "She told me to come but I was already there", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut10", text: "'Cause the walls start shaking", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut", text: "The earth was quaking", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut2", text: "My mind was aching", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut3", text: "And we were making it and you", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut4", text: "Shook me all night long", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut5", text: "Yeah you shook me all night long", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut6", text: "Working double time", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut7", text: "On the seduction line", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut8", text: "She was one of a kind, she's just mine all mine", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut9", text: "Wanted no applause", timeSent: Number(new Date().getTime())});
+saveNewResponse(Posts, {userID: "Sumnut10", text: "Just another course", timeSent: Number(new Date().getTime())});
 
 setTimeout(function() {
-    Posts.find({userID: "Sumnut"}).limit(1).then(function(results){
-        saveNewResponse(Comments,{commentID: results[0]._id, userID:"Sumnut2", text:"Well fuck you", timeSent: Number(new Date().getTime())});
+    Posts.find({userID: "Sumnut"}).then(function(results){
+        saveNewResponse(Comments,{commentID: results[0]._id, userID:"Sumnut2", text:"Made a meal out of me and came back for more", timeSent: Number(new Date().getTime())});
+        saveNewResponse(Comments,{commentID: results[1]._id, userID:"Sumnut3", text:"Had to cool me down", timeSent: Number(new Date().getTime())});
+    });
+    Posts.find({userID: "Sumnut2"}).then(function(results){
+        saveNewResponse(Comments,{commentID: results[0]._id, userID:"Sumnut3", text:"To take another round", timeSent: Number(new Date().getTime())});
+        saveNewResponse(Comments,{commentID: results[1]._id, userID:"Sumnut4", text:"Now I'm back in the ring to take another swing", timeSent: Number(new Date().getTime())});
+    });
+    Posts.find({userID: "Sumnut3"}).then(function(results){
+        saveNewResponse(Comments,{commentID: results[0]._id, userID:"Sumnut4", text:"'Cause the walls were shaking", timeSent: Number(new Date().getTime())});
+        saveNewResponse(Comments,{commentID: results[1]._id, userID:"Sumnut5", text:"The earth was quaking", timeSent: Number(new Date().getTime())});
     });
 }, 100);
-
-
-// var Posts = mongoose.model('posts', postTable);
-//     userID: String,
-//     text: String,
-//     timeSent: Number
-
-// var Comments = mongoose.model('comments', CommentsTable);
-//     commentID: String,
-//     userID: String,
-//     text :String,
-//     timeSent: Number
-
-
-
-
-
-// saveNewResponse(Users, { username: "Sumnut", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("stronger")});
-// saveNewResponse(Users, { username: "Sumnut2", email: "Matthew@Oneill.com", fname: "Matthew", lname : "ONeill", hashedPassword: bcrypt.hashSync("stronger")});
-
-// username: {type: String, 
-//               unique: true,
-//               index: true},
-//     email: String,
-//     fname: String, 
-//     lname: String,
-//     hashedPassword: String
-
+//Note: I used The "You Shook Me All Night Long" Lyrics for the text of the post, i don't claim any right to the song, it is property of AC/DC, Atlantic, and Robert John "Mutt" Lange
 
 //listen for a connection
 http.listen(app.get('port'), function(){
     console.log('Server started. Listening at *:' + app.get('port'));
 });
 
-
-
-
-/*
-div(class="frendur_post")
-            div(class="post_header")
-                div(class="post_head")
-                    img(src="/profile/my_image")
-                    a(class="post_head_username", href="/Profile?username=Sumnut") Sumnut
-                div(class="post_text") This is The first test of a post This is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a postThis is The first test of a post
-            div(class="post_comments")
-                div(class="frendur_comment")
-                    div(class="f_c_image")
-                        img(class="frendur_comment_img", src="/profile/my_image")
-                    div(class="f_c_text")
-                        a(class="comment_username", href="/Profile?username=Sumnut") Sumnut 
-                        span This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment This is a Test Comment
-*/

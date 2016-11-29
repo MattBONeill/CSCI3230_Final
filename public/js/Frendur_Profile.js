@@ -12,6 +12,7 @@ $(document).ready(function(){
 		$('.Friends_List').append(friends);
 	}});
 
+	$('.P_B_username>button').click(addFriend);
 
 });
 
@@ -27,4 +28,11 @@ function PostRefresh()
 function makeFriend(username)
 {
 	return '<div class="P_C_Friend"><a href="/Profile?username='+username+'"><img src="/Profile/image?username='+username+'"></a><span>'+username+'</span></div>';
+}
+
+function addFriend()
+{
+	$.ajax({url:'/Profile/Friends/Add?username=' + $('.P_B_username').find('span').text() , type:'Post', success: function(){
+		location.reload();
+	}});
 }

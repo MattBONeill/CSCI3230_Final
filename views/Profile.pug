@@ -16,6 +16,8 @@ block content
 						img(src="/Profile/image?username=" + username)
 				div(class="P_B_username")
 					span #{username}
+					if (!isFriend)
+						Button Add as Friend
 			div(class="P_Content")
 				div(class="P_C_Friends")
 					div(class="Friends_Banner")
